@@ -23,13 +23,17 @@ for news_link in news_links:
     # 기사 제목과 내용 출력
     news_title = driver.find_element(By.TAG_NAME,"strong").text
     print("제목:", news_title)
-    news_content = driver.find_element(By.CSS_SELECTOR,"div.articleCont").text
 
-    print("내용:", news_content)
+    root_div = driver.find_element(By.TAG_NAME, "div")
+    content_box_div = root_div.find_element(By.CLASS_NAME, "NewsEnd_contentBox__R7Ics")
+    print(content_box_div.text)
+    # news_content = driver.find_element(By.CSS_SELECTOR,"div.articleCont").text
+
+    # print("내용:", news_content)
     
     # 기사 내용 출력 후 다시 원래 탭으로 전환
     driver.close()
-    driver.switch_to.window(driver.window_handles[0])
+    driver.switch_to.window(driver.window_handles[-1])
     time.sleep(1)
     
     # 다음 뉴스 기사로 이동
