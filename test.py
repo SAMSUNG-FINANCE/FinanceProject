@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = 'https://markets.hankyung.com/stock/005930/financial-summary'
+url = 'https://markets.hankyung.com/stock/005930'
 
 response = requests.get(url)
 
