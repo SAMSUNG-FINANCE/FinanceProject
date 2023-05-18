@@ -4,17 +4,19 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import StaleElementReferenceException,NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import openpyxl
+import re
+
 
 wb=openpyxl.Workbook()
 sheet=wb.active
 
-sheet.append(["LG화학 뉴스 제목","LG화학 뉴스 본문"])
+sheet.append(["SK하이닉스 뉴스 제목","SK하이닉스 뉴스 본문"])
 
 # WebDriver 객체 생성
 driver = webdriver.Chrome()
 
-# 네이버 증권 LG화학 뉴스 페이지 접속
-url = "https://m.stock.naver.com/domestic/stock/051910/news/title"
+# 네이버 증권 SK하이닉스 뉴스 페이지 접속
+url = "https://m.stock.naver.com/domestic/stock/000660/news/title"
 driver.get(url)
 driver.implicitly_wait(10)
 
@@ -25,11 +27,15 @@ news_links =driver.find_elements(By.CSS_SELECTOR,"#content > div:nth-child(4) > 
 print(len(news_links))
 news_count=0
 
+count=0
+
 for idx,news_link in enumerate(news_links):
     # print("현재 뉴스 개수:", news_count)
 
     # 10개까지만 가져온다
-    if(idx==11):
+    # if(idx==11):
+    #     break
+    if count==11:
         break
 
     try:
@@ -48,10 +54,20 @@ for idx,news_link in enumerate(news_links):
         # 뉴스 본문
         root_div = driver.find_element(By.TAG_NAME, "div")
         content_box_div = root_div.find_element(By.CLASS_NAME, "NewsEnd_contentBox__R7Ics")
-        news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+        # news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+        try:
+            news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+    
+        # 정규식을 사용하여 본문의 시작이 [인지 확인
+            if not re.match(r"^\[", news_content):
+                sheet.append([news_title,news_content])
+            else:
+                count-=1
+        except NoSuchElementException:
+            count-=1
         print(news_content)
 
-        sheet.append([news_title,news_content])
+        # sheet.append([news_title,news_content])
         # 이후에 다시 기존 탭으로 전환
         driver.back()
         print("이전 url:", driver.current_url)
@@ -60,6 +76,7 @@ for idx,news_link in enumerate(news_links):
         time.sleep(1)
 
         news_count += 1
+        count+=1
     except StaleElementReferenceException:
         print("StaleElementReferenceException 발생")
         news_links = driver.find_elements(By.CSS_SELECTOR, "#content > div:nth-child(4) > div:nth-child(3) > div:nth-child(2) > div.NewsList_article__2hkCL > ul > li")
@@ -80,11 +97,23 @@ for idx,news_link in enumerate(news_links):
             # 뉴스 본문
             root_div = driver.find_element(By.TAG_NAME, "div")
             content_box_div = root_div.find_element(By.CLASS_NAME, "NewsEnd_contentBox__R7Ics")
-            news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+            # news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+            try:
+                news_content = content_box_div.find_element(By.CLASS_NAME, "NewsEnd_textEnd__xIOkX").text
+    
+            # 정규식을 사용하여 본문의 시작이 [인지 확인
+                if not re.match(r"^\[", news_content):
+                    sheet.append([news_title,news_content])
+                else:
+                    count-=1
+            except NoSuchElementException:
+                count-=1
             print(news_content)
 
+            # print(news_content)
 
-            sheet.append([news_title,news_content])
+
+            # sheet.append([news_title,news_content])
             # 이후에 다시 기존 탭으로 전환
             driver.back()
             print("이전 url:", driver.current_url)
@@ -99,6 +128,9 @@ for idx,news_link in enumerate(news_links):
 
 
 
-    news_count += 1
-wb.save(filename='LG화학 기사 스크래핑.xlsx')
+        news_count += 1
+        count+=1
+
+
+wb.save(filename='SK하이닉스 기사 스크래핑.xlsx')
 driver.quit()
