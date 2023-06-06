@@ -21,3 +21,8 @@
 👩 조예지 - 개발, 시나리오 작성<br/>
 
 ## 로컬 환경에서 DB import하는 법
+1. sql파일을 로컬에 저장
+2. 옵션 -> Server -> Data Imort
+3. [Import from Self-Contained File] 클릭 후, 저장한 DB 파일 선택
+4. new database 생성
+5. Start Import
